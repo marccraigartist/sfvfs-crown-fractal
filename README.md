@@ -17,3 +17,9 @@ The complete program is in [index.html](index.html); it has no external runtime 
 This companion examines the 30 distinct stations formed by 36 ring slots, including six shared hubs. Compare nine-edge octant loops and twelve-edge ring or mixed loops, then run 144 or 1,728 graph moves. Closed routes have measured spherical parallel-transport holonomy. A separate lab compares order-sensitive similarity-map addresses and an exact projected overlap of two distinct 3D points.
 
 The shared hubs make graph routes meet; they do not imply different finite addresses over the 30 unique maps land on the same 3D point. These geometries are established constructions used as an SFVFS visual study, with no claim of a prime predictor or RH proof.
+
+## Memory Stem experiment
+
+[Open the history-sensitive explorer](https://marccraigartist.github.io/sfvfs-crown-fractal/memory.html) · [Read the rule and B-constraint lineage](MEMORY_RULE_NOTES.md)
+
+The same three-axis 30-station geometry has 36 ring-seat labels, including six shared hubs. A bounded proposed memory charge changes a later child's scale and crown angle after a hub or ring-switch event. The alias microscope compares two labels for +x followed by the same labels: centers agree through depth two and split at depth three only when the earlier event is read. Active, write-only, and fixed-map controls use the same paths. The rule is an SFVFS-inspired experiment; B13 memory and this geometric feedback are not Lean-established. History-dependent IFS themselves have substantial prior art.
