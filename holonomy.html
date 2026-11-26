@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SFVFS · Shared-Seat Holonomy</title>
+<style>
+:root{color-scheme:dark;--bg:#060b1b;--card:#0a1429ec;--border:#34445c;--text:#ebf4ff;--muted:#a8bdd4;--cyan:#67e6ff;--gold:#ffc783;--violet:#dba7ff}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:13px/1.42 system-ui,-apple-system,Segoe UI,sans-serif}
+button,select,input{font:inherit}button,select{color:var(--text);background:#17243d;border:1px solid #53617c;border-radius:9px;padding:8px 10px;cursor:pointer}button:hover,select:hover{border-color:#89d9ef}button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}button.active{background:#214a62;border-color:var(--cyan)}button:disabled{opacity:.5;cursor:default}
+#view{display:block;width:100vw;height:100vh;touch-action:none;cursor:grab}#view:active{cursor:grabbing}
+.head,.panel,.foot,.legend{position:fixed;background:var(--card);border:1px solid var(--border);box-shadow:0 12px 35px #0008;backdrop-filter:blur(13px);border-radius:15px}
+.head{top:13px;left:14px;padding:12px 15px;max-width:min(400px,calc(100vw - 30px))}.head strong{font-size:12px;letter-spacing:.15em}.head small{display:block;color:var(--muted);margin-top:2px}.head a{color:#8deaff;text-decoration:none}.head a:hover{text-decoration:underline}
+.panel{right:14px;top:13px;width:min(355px,calc(100vw - 28px));max-height:calc(100vh - 29px);overflow:auto;scrollbar-color:#55708a transparent}.panel summary{list-style:none;padding:13px 15px;cursor:pointer;font-size:12px;font-weight:750;letter-spacing:.12em;border-bottom:1px solid var(--border)}.panel summary::-webkit-details-marker{display:none}.panel summary:after{content:'−';float:right;color:#93d9ef}.panel:not([open]) summary{border-bottom:0}.panel:not([open]) summary:after{content:'+'}.body{padding:12px 14px 15px}
+.tabs{display:flex;gap:7px;margin-bottom:12px}.tabs button{flex:1;font-weight:700}.group{margin:11px 0}.group label{display:block;color:#b7cbe1;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}.group select{width:100%}.row{display:flex;gap:7px;align-items:center}.row>*{flex:1}.row button{flex:0 0 auto}.slider{width:100%;accent-color:#64deef;margin:8px 0}.readout{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}.metric{border:1px solid #35455e;border-radius:10px;padding:9px 10px;background:#101d34}.metric small{display:block;color:#99aec5;font-size:10px;text-transform:uppercase;letter-spacing:.08em}.metric b{display:block;font-size:14px;margin-top:2px}.metric.wide{grid-column:1/-1}.cyan{color:var(--cyan)}.gold{color:var(--gold)}.violet{color:var(--violet)}
+.note{border-top:1px solid #35455e;margin-top:13px;padding-top:11px;color:#bdd0e6;font-size:11px}.note b{color:#f0f5ff}.evidence{font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;background:#091126;padding:8px;border:1px solid #30425d;border-radius:8px;overflow-wrap:anywhere;margin-top:8px}
+.foot{left:14px;bottom:13px;padding:10px 13px;max-width:min(510px,calc(100vw - 28px));font-size:11px;color:#c9d8e8}.foot b{color:#fff}.foot .line{margin:2px 0}.foot input{accent-color:#e0aaff;vertical-align:middle}.legend{left:14px;top:95px;padding:7px 11px;font-size:10px;color:#b5cbe0;display:flex;gap:10px}.sw{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}.legend .sw.hub{background:#fff;box-shadow:0 0 8px #fff}.legend .sw.a{background:var(--cyan)}.legend .sw.x{background:var(--gold)}.legend .sw.cross{background:var(--violet)}
+@media(max-width:730px){.head{top:9px;left:8px;padding:9px 11px;max-width:calc(100vw - 16px)}.head strong{font-size:10px}.head small{font-size:10px}.legend{top:66px;left:8px;gap:6px;max-width:calc(100vw - 16px);font-size:9px}.panel{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:58vh}.panel:not([open]){bottom:8px}.foot{bottom:70px;left:8px;right:8px;max-width:none;font-size:10px;padding:6px 9px}.panel[open]~.foot{display:none}.body{padding:9px 12px 12px}.panel summary{padding:10px 12px}.metric{padding:7px 8px}.metric b{font-size:12px}}
+</style>
+</head>
+<body>
+<canvas id="view" aria-label="Projected three-ring thirty-station graph with two walking paths, their transported tangent arrows, and optional projection crossings"></canvas>
+<div class="head"><strong>SFVFS · SHARED-SEAT HOLONOMY</strong><small>36 ring slots → 30 stations → 6 shared hubs</small><small><a href="./">← Crown Fractal</a> · one B12 launch · geometric path laboratory</small></div>
+<div class="legend"><span><i class="sw hub"></i>shared hub</span><span><i class="sw a"></i>A route</span><span><i class="sw x"></i>B route</span><span><i class="sw cross"></i>chord crossing</span></div>
+<details class="panel" id="panel" open><summary>PATH & ADDRESS EXPLORER</summary><div class="body">
+ <div class="tabs"><button id="loopTab" class="active">Sphere loops</button><button id="addressTab">Recursive addresses</button></div>
+ <section id="loops">
+  <div class="group"><label for="preset">Number of graph moves</label><select id="preset"><option value="9">9 · A octant / reverse</option><option value="12" selected>12 · ring / mixed loop</option><option value="144">144 · twelve returns</option><option value="1728">1,728 · 144 returns</option></select></div>
+  <div class="group"><label for="pair">Routes from the same +x hub</label><select id="pair"><option value="ring-mixed" selected>Full XY ring ↔ switched mixed loop</option><option value="oct-reverse">A octant ↔ reverse octant</option><option value="ring-oct">Full XY ring ↔ A octant</option></select></div>
+  <div class="group"><label for="step">Step <span id="stepLabel">0 / 12</span></label><input id="step" class="slider" type="range" min="0" max="12" value="0" step="1" aria-label="Graph step"></div>
+  <div class="row"><button id="play">Play</button><button id="one">+1 step</button><button id="reset">B12 ↺</button><select id="speed" aria-label="Moves per second"><option value="6" selected>6/s</option><option value="24">24/s</option><option value="48">48/s</option><option value="144">144/s</option></select></div>
+  <div class="readout">
+   <div class="metric"><small>A endpoint</small><b class="cyan" id="endA">+x</b></div><div class="metric"><small>B endpoint</small><b class="gold" id="endX">+x</b></div>
+   <div class="metric"><small>Same graph station</small><b id="meet">B12 start</b></div><div class="metric"><small>Simultaneous meetings</small><b id="meetCount">0 after start</b></div>
+   <div class="metric"><small>A closed-loop transport</small><b class="cyan" id="holA">0°</b></div><div class="metric"><small>B closed-loop transport</small><b class="gold" id="holX">0°</b></div>
+   <div class="metric wide"><small>Graph returns / winding</small><b id="returns">—</b></div>
+   <div class="metric wide"><small>Nested IFS addresses · separate from graph endpoint</small><b id="ifsCompare">No moves yet</b></div>
+  </div>
+  <div class="note" id="loopNote">Holonomy is the rotation of a tangent arrow after a <b>closed path on the unit sphere</b>. An open path has a transported arrow but no holonomy angle. A graph return is not an IFS address collision. A 9-edge octant has area 1/8 of the sphere and ±90° holonomy. These A/B comparison routes both start at +x; B is <b>not</b> the Crown Fractal's antipodal X body.</div>
+ </section>
+ <section id="addresses" hidden>
+  <div class="group"><label for="addressCase">Address experiment</label><select id="addressCase"><option value="swap">Order swap: Fₛ∘Fₜ versus Fₜ∘Fₛ</option><option value="shadow">Exact projected shadow collision at depth 3</option><option value="alias">Two ring-slot labels, one shared station</option></select></div>
+  <div id="pickers"><div class="row"><div class="group"><label for="sPick">Station s</label><select id="sPick"></select></div><div class="group"><label for="tPick">Station t</label><select id="tPick"></select></div></div></div>
+  <div class="readout"><div class="metric"><small>Exact 3D separation</small><b id="dist3">—</b></div><div class="metric"><small>2D projection separation</small><b id="dist2">—</b></div><div class="metric wide"><small>Classification</small><b id="addressClass">—</b></div></div>
+  <div class="evidence" id="addressFormula"></div>
+  <div class="note"><b>Three different equalities:</b> two slot names can denote the same station; graph walks can meet at one vertex; nested IFS addresses can be compared for exact coordinates. The displayed shadow pair has <b>equal 2D projections and different 3D positions</b>. Its address digits are not required to be adjacent graph moves. At depth 3 there are 27,000 unique 3D addresses and 180 pairs sharing a 2D projection.</div>
+  <div class="note">For finite addresses of equal depth using the <b>30 unique stations</b>, distinct sequences cannot coincide exactly in 3D. The parity split over ℚ(√3) and the seat separation bound certify this; the six shared hubs only duplicate the original 36 slot labels. This statement is about finite addresses, not a claim about every infinite-address limit.</div>
+ </section>
+</div></details>
+<div class="foot" id="foot"><div class="line"><b>30 vertices · 36 spherical edges · 6 four-way hubs</b> <span id="crossCount"></span></div><div class="line">An octahedron's 12 edges split three ways: 8 spherical octants, cycle rank 7. <label><input id="crossings" type="checkbox" checked> projected crossings</label></div><div class="line">B12 is a shared <em>phase</em>, not one co-located three-axis point. Drag/pinch/zoom; tap a white hub for its two labels.</div><div class="line" id="selectedHub">Root: +x = xy B12 / zx B3.</div></div>
+<script>
+(()=>{'use strict';
+const TAU=2*Math.PI,Q=Math.sin(Math.PI/12),N=[1,1,1].map(v=>v/Math.sqrt(3));
+const E=[[1,0,0],[0,1,0],[0,0,1]],PLANES=[[E[0],E[1]],[E[1],E[2]],[E[2],E[0]]],RING=['xy','yz','zx'];
+const EX=[1/Math.sqrt(2),-1/Math.sqrt(2),0],EY=[1/Math.sqrt(6),1/Math.sqrt(6),-2/Math.sqrt(6)];
+const AXCOL=['#65dbff','#ff6cda','#ffc37f'];
+const dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>Math.hypot(...a),add=(a,b)=>a.map((v,i)=>v+b[i]),sub=(a,b)=>a.map((v,i)=>v-b[i]),mul=(a,t)=>a.map(v=>v*t),proj=p=>[dot(p,EX),dot(p,EY)],deg=a=>a*180/Math.PI;
+const stations=[],slot=[[],[],[]],byKey=new Map();
+for(let j=0;j<3;j++)for(let k=0;k<12;k++){
+ const [u,v]=PLANES[j],t=TAU*k/12,p=u.map((n,i)=>Math.cos(t)*n+Math.sin(t)*v[i]);
+ const key=p.map(x=>Math.round(x*1e9)).join(',');let id=byKey.get(key);
+ if(id===undefined){id=stations.length;byKey.set(key,id);stations.push({p,slots:[],neighbors:[]});}
+ stations[id].slots.push({j,k});slot[j][k]=id;
+}
+if(stations.length!==30||stations.filter(x=>x.slots.length===2).length!==6)throw Error('Station count mismatch');
+const edge=[],edgeKey=new Map();for(let j=0;j<3;j++)for(let k=0;k<12;k++){
+ const a=slot[j][k],b=slot[j][(k+1)%12],key=[a,b].sort((x,y)=>x-y).join(':');
+ const id=edge.length;edge.push({a,b,j,k});edgeKey.set(key,id);stations[a].neighbors.push({id:b,e:id});stations[b].neighbors.push({id:a,e:id});
+}if(edge.length!==36||stations.filter(s=>s.neighbors.length===4).length!==6)throw Error('Edge count mismatch');
+const axisName=p=>{let i=p.findIndex(v=>Math.abs(v)>.999);return i<0?null:(p[i]>0?'+':'−')+'xyz'[i]};
+const seatName=({j,k})=>`${RING[j]} B${k||12}`;
+const stationName=id=>axisName(stations[id].p)||`S${id}`;
+const root=slot[0][0];
+const closed=(steps)=>{const out=[root];for(const [j,from,to,dir] of steps){for(let k=from;dir>0?k<to:k>to;k+=dir){const id=slot[j][((k+dir)%12+12)%12];if(out.at(-1)===id)throw Error('Duplicate path edge');out.push(id);}}if(out.at(-1)!==root)throw Error('Unclosed path');return out;};
+// Each segment list uses inclusive arrival seat; individual edges are 30° geodesic arcs.
+const oct=closed([[0,0,3,1],[1,0,3,1],[2,0,3,1]]);
+const reverse=closed([[2,3,0,-1],[1,3,0,-1],[0,3,0,-1]]);
+const ring=closed([[0,0,12,1]]);
+const mixed=closed([[0,0,3,1],[1,0,6,1],[0,9,12,1]]);
+const routes={oct,reverse,ring,mixed};
+function rotate(v,p,q){const a=cross(p,q),sn=norm(a),cs=dot(p,q),ang=Math.atan2(sn,cs),u=mul(a,1/sn);return add(add(mul(v,Math.cos(ang)),mul(cross(u,v),Math.sin(ang))),mul(u,dot(u,v)*(1-Math.cos(ang))));}
+function oneLoopH(seq){let v=[0,1,0];for(let i=1;i<seq.length;i++)v=rotate(v,stations[seq[i-1]].p,stations[seq[i]].p);return Math.atan2(dot(stations[root].p,cross([0,1,0],v)),dot([0,1,0],v));}
+const baseH=Object.fromEntries(Object.entries(routes).map(([key,seq])=>[key,oneLoopH(seq)]));
+if(Math.abs(deg(baseH.oct)-90)>1e-7||Math.abs(deg(baseH.reverse)+90)>1e-7||Math.abs(deg(baseH.ring))>1e-7||Math.abs(Math.abs(deg(baseH.mixed))-180)>1e-7)throw Error('Holonomy invariant failed');
+function at(route,n){const seq=routes[route],period=seq.length-1;return seq[n%period];}
+function transported(route,n){let v=[0,1,0];for(let i=1;i<=n;i++)v=rotate(v,stations[at(route,i-1)].p,stations[at(route,i)].p);return v;}
+const pairs={'ring-mixed':['ring','mixed'],'oct-reverse':['oct','reverse'],'ring-oct':['ring','oct']};
+const can=document.getElementById('view'),ctx=can.getContext('2d');let W=0,H=0,DPR=1,unit=1,camera={x:0,y:0,z:1},mode='loops',limit=12,step=0,pair='ring-mixed',playing=false,last=0,carry=0,selected=root,showCrossings=true;
+const el=id=>document.getElementById(id),resize=()=>{W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);can.width=Math.round(W*DPR);can.height=Math.round(H*DPR);can.style.width=W+'px';can.style.height=H+'px';unit=Math.min(W,H)*(W<730?.30:.36);draw();};
+function screen3(p){const v=proj(p);return [W*.48+unit*camera.z*(v[0]-camera.x),H*.51-unit*camera.z*(v[1]-camera.y)];}
+function worldAt(x,y){return [camera.x+(x-W*.48)/(unit*camera.z),camera.y-(y-H*.51)/(unit*camera.z)];}
+function zoomAt(f,x,y){let before=worldAt(x,y);camera.z=Math.max(.3,Math.min(30,camera.z*f));let after=worldAt(x,y);camera.x+=before[0]-after[0];camera.y+=before[1]-after[1];draw();}
+function projectedCrossings(){const out=[];for(let a=0;a<edge.length;a++)for(let b=a+1;b<edge.length;b++){
+ const A=edge[a],B=edge[b];if([A.a,A.b].some(v=>v===B.a||v===B.b))continue;
+ const p=proj(stations[A.a].p),r=sub(proj(stations[A.b].p),p),q=proj(stations[B.a].p),s=sub(proj(stations[B.b].p),q);
+ const den=r[0]*s[1]-r[1]*s[0];if(Math.abs(den)<1e-10)continue;
+ const qp=sub(q,p),t=(qp[0]*s[1]-qp[1]*s[0])/den,u=(qp[0]*r[1]-qp[1]*r[0])/den;
+ if(t>1e-7&&t<1-1e-7&&u>1e-7&&u<1-1e-7)out.push({p:add(p,mul(r,t)),a,b});
+}return out;}
+const crossings=projectedCrossings();el('crossCount').textContent=`· ${crossings.length} projected edge-chord crossings`;
+function paintBackground(){let g=ctx.createRadialGradient(W*.48,H*.48,0,W*.48,H*.48,Math.max(W,H)*.75);g.addColorStop(0,'#152545');g.addColorStop(.54,'#0b1831');g.addColorStop(1,'#050915');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
+function glow(x,y,r,color,alpha=1){ctx.save();ctx.globalAlpha=alpha;ctx.shadowColor=color;ctx.shadowBlur=r*3;ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();ctx.restore();}
+function strokePath(points,color,width=2,alpha=1){if(points.length<2)return;ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineJoin='round';ctx.lineCap='round';ctx.shadowColor=color;ctx.shadowBlur=width*4;ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();ctx.restore();}
+function graph(){for(let j=0;j<3;j++){const p=[];for(let k=0;k<=192;k++){let t=TAU*k/192,[u,v]=PLANES[j];p.push(screen3(u.map((x,i)=>Math.cos(t)*x+Math.sin(t)*v[i])));}strokePath(p,AXCOL[j],1.3,.37);}
+ for(const e of edge){const a=screen3(stations[e.a].p),b=screen3(stations[e.b].p);strokePath([a,b],AXCOL[e.j],1.2,.31);}
+ if(showCrossings)for(const x of crossings){const p=[W*.48+unit*camera.z*(x.p[0]-camera.x),H*.51-unit*camera.z*(x.p[1]-camera.y)];ctx.strokeStyle='#d698ff90';ctx.lineWidth=1;ctx.beginPath();ctx.arc(...p,3,0,TAU);ctx.stroke();}
+ for(let i=0;i<stations.length;i++){let p=screen3(stations[i].p),hub=stations[i].slots.length===2;glow(...p,hub?3.5:2,hub?'#f6fbff':'#9fb3d0',hub?.9:.55);}
+ const hubs=stations.map((s,i)=>({s,i})).filter(x=>x.s.slots.length===2);
+ ctx.font='11px system-ui';ctx.fillStyle='#d6e9ff';for(const {s,i} of hubs){const p=screen3(s.p);ctx.fillText(stationName(i),p[0]+8,p[1]-9);}
+ if(stations[selected].slots.length===2){const p=screen3(stations[selected].p);ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(...p,9,0,TAU);ctx.stroke();}
+}
+function arrow(origin,v,color){const a=screen3(origin),b=screen3(add(origin,mul(v,.18)));strokePath([a,b],color,2.1,1);let t=Math.atan2(b[1]-a[1],b[0]-a[0]);let wings=[[t+2.55],[t-2.55]].map(z=>[b[0]+8*Math.cos(z[0]),b[1]+8*Math.sin(z[0])]);strokePath([wings[0],b,wings[1]],color,2,1);}
+function routeDraw(route,color){let count=Array(edge.length).fill(0);for(let i=1;i<=step;i++){let key=[at(route,i-1),at(route,i)].sort((a,b)=>a-b).join(':');let id=edgeKey.get(key);if(id!==undefined)count[id]++;}
+ for(let i=0;i<edge.length;i++)if(count[i]){let e=edge[i],a=screen3(stations[e.a].p),b=screen3(stations[e.b].p);strokePath([a,b],color,Math.min(6,1.5+Math.log1p(count[i])*.95),.27);}
+ let points=[];for(let i=Math.max(0,step-30);i<=step;i++)points.push(screen3(stations[at(route,i)].p));strokePath(points,color,2.4,.8);
+ const p=stations[at(route,step)].p;arrow(p,transported(route,step),color);glow(...screen3(p),6,color);}
+function loopsDraw(){const [a,b]=pairs[pair];routeDraw(a,'#65e7ff');routeDraw(b,'#ffc782');}
+const addr=(ids)=>ids.reduce((p,id,i)=>add(p,mul(stations[id].p,Q**i)),[0,0,0]);
+const shadowA=[1,0,9],shadowB=[18,0,3];
+if(norm(sub(proj(addr(shadowA)),proj(addr(shadowB))))>1e-9||Math.abs(norm(sub(addr(shadowA),addr(shadowB)))-1.5)>1e-9)throw Error('Shadow projection certificate failed');
+let addressCase='swap',sPick=0,tPick=3;
+function addressObjects(){if(addressCase==='shadow')return {a:addr(shadowA),b:addr(shadowB),la:'A (1,0,9)',lb:'B (18,0,3)'};
+ if(addressCase==='alias')return {a:stations[root].p,b:stations[root].p,la:'xy B12',lb:'zx B3'};
+ return {a:addr([sPick,tPick]),b:addr([tPick,sPick]),la:`F${sPick}∘F${tPick}`,lb:`F${tPick}∘F${sPick}`};}
+function addressDraw(){const {a,b}=addressObjects(),pa=screen3(a),pb=screen3(b);if(norm(sub(proj(a),proj(b)))>1e-8)strokePath([pa,pb],'#d8a5fa',1.6,.7);glow(...pa,7,'#65e7ff',.9);ctx.strokeStyle='#ffc782';ctx.lineWidth=2.5;ctx.shadowColor='#ffc782';ctx.shadowBlur=14;ctx.beginPath();ctx.arc(...pb,10,0,TAU);ctx.stroke();ctx.shadowBlur=0;
+ const normalA=dot(a,N),normalB=dot(b,N),x=W<730?W*.5:W*.48,y=H*.17;ctx.font='11px system-ui';ctx.fillStyle='#baccdf';ctx.fillText('depth along (1,1,1)',x-65,y-15);ctx.strokeStyle='#9cacc388';ctx.beginPath();ctx.moveTo(x-115,y);ctx.lineTo(x+115,y);ctx.stroke();let extent=Math.max(1.4,Math.abs(normalA),Math.abs(normalB));glow(x+normalA/extent*105,y,4,'#65e7ff');ctx.strokeStyle='#ffc782';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x+normalB/extent*105,y,6,0,TAU);ctx.stroke();}
+function draw(){if(!W)return;ctx.setTransform(DPR,0,0,DPR,0,0);paintBackground();graph();if(mode==='loops')loopsDraw();else addressDraw();}
+const signed=(x)=>`${x>0?'+':''}${Math.abs(x)<1e-5?'0':x.toFixed(1)}°`;
+function holText(route){const period=routes[route].length-1,cycles=Math.floor(step/period),last=cycles*period;
+ if(step===0)return 'start · 0°';if(step%period!==0)return `open · last return ${last||'none'}`;
+ const h=oneLoopH(routes[route]),net=deg(Math.atan2(Math.sin(h*cycles),Math.cos(h*cycles)));
+ return `${signed(net)} · ${cycles} loop${cycles===1?'':'s'}`;
+}
+function updateLoop(){const [a,b]=pairs[pair],same=at(a,step)===at(b,step);let meetings=0;for(let i=1;i<=step;i++)if(at(a,i)===at(b,i))meetings++;
+ el('stepLabel').textContent=`${step.toLocaleString()} / ${limit.toLocaleString()}`;el('step').value=step;el('endA').textContent=stationName(at(a,step));el('endX').textContent=stationName(at(b,step));el('meet').textContent=step===0?'B12 start':same?'YES · one vertex':'No · distinct vertices';el('meetCount').textContent=`${meetings.toLocaleString()} after start`;el('holA').textContent=holText(a);el('holX').textContent=holText(b);
+ const ac=Math.floor(step/(routes[a].length-1)),bc=Math.floor(step/(routes[b].length-1));el('returns').textContent=`A: ${ac} × ${signed(deg(baseH[a]))}; B: ${bc} × ${signed(deg(baseH[b]))} per primitive closed loop.`;
+ if(step===0)el('ifsCompare').textContent='No moves yet';else{const wa=[],wb=[];let first=0;for(let i=1;i<=step;i++){const va=at(a,i),vb=at(b,i);wa.push(va);wb.push(vb);if(!first&&va!==vb)first=i;}if(!first)el('ifsCompare').textContent=`Same ${step} station digits · identical nested address`;else{const delta=norm(sub(addr(wa),addr(wb)));el('ifsCompare').textContent=`Distinct exactly · first differing digit ${first} · displayed |Δ| ≈ ${delta.toPrecision(5)}${step>32?' (finite precision)':''}`;}}
+ el('play').textContent=playing?'Pause':'Play';draw();}
+function updateAddress(){const {a,b,la,lb}=addressObjects(),d3=norm(sub(a,b)),d2=norm(sub(proj(a),proj(b)));
+ el('dist3').textContent=d3.toFixed(9);el('dist2').textContent=d2.toFixed(9);el('addressClass').textContent=addressCase==='shadow'?'Same projection · distinct in 3D':addressCase==='alias'?'Same station · two slot labels':d3<1e-10?'Same chosen station':'Order matters · maps do not commute';
+ el('pickers').hidden=addressCase!=='swap';el('addressFormula').textContent=addressCase==='shadow'?`A address=(1,0,9), B address=(18,0,3) in 30-station source order. Their resulting points satisfy projection(p_A)=projection(p_B), but p_A−p_B=(√3/2)(1,1,1); |p_A−p_B|=1.5. Exact in the 2D shadow, distinct in 3D.`:addressCase==='alias'?`+x is xy B12 and zx B3. Both slot labels refer to station S${root}, hence the same F(x)=+x+q·x. Six hubs have this double label.`:`${la}(0) = s + q·t; ${lb}(0) = t + q·s. Difference = (1−q)(s−t); q=sin(π/12). Distinct stations give a nonzero 3D difference.`;
+ draw();}
+function modeSet(next){mode=next;el('loops').hidden=mode!=='loops';el('addresses').hidden=mode!=='addresses';el('loopTab').classList.toggle('active',mode==='loops');el('addressTab').classList.toggle('active',mode==='addresses');playing=false;if(mode==='loops')updateLoop();else updateAddress();}
+function choosePreset(){limit=Number(el('preset').value);pair=limit===9?'oct-reverse':'ring-mixed';el('pair').value=pair;el('speed').value=limit>=144?'48':'6';step=0;carry=0;playing=false;el('step').max=limit;updateLoop();}
+el('preset').onchange=choosePreset;el('pair').onchange=e=>{pair=e.target.value;step=0;carry=0;playing=false;updateLoop();};el('step').oninput=e=>{step=Number(e.target.value);carry=0;playing=false;updateLoop();};el('play').onclick=()=>{if(step>=limit){step=0;carry=0;}playing=!playing;updateLoop();};el('one').onclick=()=>{step=Math.min(limit,step+1);carry=0;playing=false;updateLoop();};el('reset').onclick=()=>{step=0;carry=0;playing=false;camera={x:0,y:0,z:1};updateLoop();};el('loopTab').onclick=()=>modeSet('loops');el('addressTab').onclick=()=>modeSet('addresses');el('addressCase').onchange=e=>{addressCase=e.target.value;updateAddress();};
+for(const id of ['sPick','tPick']){const select=el(id);stations.forEach((s,i)=>{const op=document.createElement('option');op.value=i;op.textContent=`${stationName(i)} · ${s.slots.map(seatName).join(' / ')}`;select.append(op);});select.onchange=()=>{sPick=Number(el('sPick').value);tPick=Number(el('tPick').value);updateAddress();};}el('sPick').value=0;el('tPick').value=3;
+el('crossings').onchange=e=>{showCrossings=e.target.checked;draw();};
+let pointers=new Map(),motion=0;can.addEventListener('wheel',e=>{e.preventDefault();zoomAt(Math.exp(-e.deltaY*.0015),e.clientX,e.clientY);},{passive:false});can.addEventListener('pointerdown',e=>{can.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});motion=0;});can.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;let p=pointers.get(e.pointerId),dx=e.clientX-p.x,dy=e.clientY-p.y;motion+=Math.hypot(dx,dy);if(pointers.size===1){camera.x-=dx/(unit*camera.z);camera.y+=dy/(unit*camera.z);draw();}else {let other=[...pointers.entries()].find(([id])=>id!==e.pointerId)?.[1];if(other){let before=Math.hypot(p.x-other.x,p.y-other.y),after=Math.hypot(e.clientX-other.x,e.clientY-other.y);if(before)zoomAt(Math.max(.7,Math.min(1.4,after/before)),(e.clientX+other.x)/2,(e.clientY+other.y)/2);}}pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});});
+can.addEventListener('pointerup',e=>{pointers.delete(e.pointerId);if(motion<8){let best=-1,d=17;for(let i=0;i<stations.length;i++)if(stations[i].slots.length===2){let p=screen3(stations[i].p),dd=Math.hypot(p[0]-e.clientX,p[1]-e.clientY);if(dd<d){best=i;d=dd;}}if(best>=0){selected=best;el('selectedHub').textContent=`${stationName(best)} = ${stations[best].slots.map(seatName).join(' / ')}; two slots, one 3D station.`;draw();}}});can.addEventListener('pointercancel',e=>pointers.delete(e.pointerId));
+function frame(ts){if(last){let dt=Math.min(.1,(ts-last)/1000);if(playing&&mode==='loops'){carry+=dt*Number(el('speed').value);let amount=Math.floor(carry);if(amount){carry-=amount;step=Math.min(limit,step+amount);if(step>=limit)playing=false;updateLoop();}}}last=ts;requestAnimationFrame(frame);}
+if(innerWidth<730)el('panel').open=false;addEventListener('resize',resize);resize();updateAddress();updateLoop();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
