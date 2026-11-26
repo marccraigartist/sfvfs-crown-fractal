@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050a18">
+<title>SFVFS · Memory Stem Laboratory</title>
+<style>
+:root{color-scheme:dark;--bg:#050a18;--card:#0a1529ed;--line:#344865;--text:#edf5ff;--muted:#adc1d8;--cyan:#78e8ff;--gold:#ffc47e;--pink:#ff8ad9}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font:13px/1.4 system-ui,-apple-system,Segoe UI,sans-serif}
+button,select,input{font:inherit}button,select{background:#16243e;border:1px solid #536987;border-radius:9px;padding:8px 10px;color:var(--text);cursor:pointer}button:hover,select:hover{border-color:#89e7ff}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}button.active{border-color:var(--cyan);background:#20516b}button:disabled{opacity:.55;cursor:default}
+#view{display:block;width:100vw;height:100vh;touch-action:none;cursor:grab}#view:active{cursor:grabbing}
+.head,.panel,.foot,.legend{position:fixed;border:1px solid var(--line);border-radius:15px;background:var(--card);backdrop-filter:blur(13px);box-shadow:0 12px 38px #0008}
+.head{top:13px;left:14px;padding:11px 14px;max-width:min(450px,calc(100vw - 28px))}.head strong{font-size:12px;letter-spacing:.15em}.head small{display:block;font-size:11px;color:var(--muted);margin-top:2px}.head a,.note a{color:#8de9ff;text-decoration:none}.head a:hover,.note a:hover{text-decoration:underline}
+.legend{top:98px;left:14px;padding:7px 11px;display:flex;flex-wrap:wrap;gap:9px;color:#bdd0e6;font-size:10px}.sw{display:inline-block;vertical-align:middle;width:8px;height:8px;border-radius:50%;margin-right:4px}.sw.base{background:#8aa5c6}.sw.cyan{background:var(--cyan)}.sw.gold{background:var(--gold)}.sw.hub{background:#fff;box-shadow:0 0 8px #fff}
+.panel{top:13px;right:14px;width:min(375px,calc(100vw - 28px));max-height:calc(100vh - 28px);overflow:auto;scrollbar-color:#55708a transparent}.panel summary{list-style:none;padding:13px 15px;cursor:pointer;font-size:12px;font-weight:750;letter-spacing:.12em;border-bottom:1px solid var(--line)}.panel summary::-webkit-details-marker{display:none}.panel summary::after{content:'−';float:right;color:#8de9ff}.panel:not([open]) summary{border-bottom:0}.panel:not([open]) summary::after{content:'+'}.body{padding:12px 14px 15px}
+.tabs,.row{display:flex;align-items:center;gap:7px}.tabs button{flex:1;font-weight:700}.row>*{flex:1}.row button{flex:0 0 auto}.group{margin:11px 0}.group label{display:block;color:#bdd0e3;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}.group select{width:100%}.slider{width:100%;accent-color:#75eaff;cursor:pointer;margin:8px 0}
+.readout{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:11px 0}.metric{background:#101e36;border:1px solid #354b68;border-radius:10px;padding:8px 10px;min-width:0}.metric.wide{grid-column:1/-1}.metric small{display:block;color:#a3b7cf;font-size:10px;letter-spacing:.06em;text-transform:uppercase}.metric b{display:block;margin-top:2px;font-size:14px;overflow-wrap:anywhere}.cyan{color:var(--cyan)}.gold{color:var(--gold)}.pink{color:var(--pink)}
+.note{margin:11px 0 0;border-top:1px solid #354b68;padding-top:10px;color:#bcd0e6;font-size:11px}.note b{color:#f4f9ff}.formula{background:#081329;border:1px solid #334965;border-radius:9px;padding:9px 10px;font:11px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;color:#ddedff}.path{background:#0b1b31;border:1px solid #355276;border-radius:9px;padding:8px 10px;margin-top:8px;color:#d7e8fa;font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.timeline{border-collapse:collapse;width:100%;margin-top:8px;font-size:10px}.timeline th,.timeline td{text-align:left;border-bottom:1px solid #334864;padding:4px 3px}.timeline th{color:#b7cce2}.timeline tr.current{background:#203b58}
+.foot{left:14px;bottom:13px;padding:9px 12px;max-width:min(550px,calc(100vw - 28px));color:#c1d5e9;font-size:11px}.foot .line{margin:2px 0}.foot b{color:#fff}.foot button{padding:3px 8px;font-size:12px}.foot .row{justify-content:flex-start;gap:6px}.foot .row>*{flex:0 0 auto}
+@media(max-width:760px){.head{top:8px;left:8px;padding:8px 10px;max-width:calc(100vw - 16px)}.head strong{font-size:10px}.head small{font-size:10px}.legend{top:67px;left:8px;max-width:calc(100vw - 16px);font-size:9px;gap:5px;padding:5px 7px}.panel{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:58vh}.panel summary{padding:10px 12px}.body{padding:9px 11px 12px}.metric{padding:7px 8px}.metric b{font-size:12px}.foot{left:8px;right:8px;bottom:60px;max-width:none;padding:6px 8px;font-size:10px}.panel[open]~.foot{display:none}}
+</style>
+</head>
+<body>
+<canvas id="view" aria-label="Three-axis recursive gyroscopes comparing fixed similarity maps with an experimental bounded memory-stem rule"></canvas>
+<div class="head"><strong>SFVFS · MEMORY STEM LAB</strong><small>36 ring labels → 30 unique stations · six shared hubs</small><small><a href="./">← Crown Fractal</a> · <a href="holonomy.html">shared-seat holonomy</a> · proposed B13 geometry experiment</small></div>
+<div class="legend"><span><i class="sw base"></i>fixed-map ghost</span><span><i class="sw cyan"></i>history A</span><span><i class="sw gold"></i>history B</span><span><i class="sw hub"></i>shared station</span></div>
+<details class="panel" id="panel" open><summary>RECURSION &amp; LINEAGE</summary><div class="body">
+ <div class="tabs"><button id="forestTab" class="active">Recursive forest</button><button id="aliasTab">Alias microscope</button></div>
+ <div class="group"><label for="feedback">Geometric feedback</label><select id="feedback"><option value="active" selected>Read + write memory</option><option value="writeonly">Write only · ablation</option><option value="off">Fixed maps · control</option></select></div>
+ <section id="forestControls">
+  <div class="group"><label for="depth">Visible generations · <span id="depthLabel">5</span></label><input id="depth" class="slider" type="range" min="1" max="8" value="5" step="1"></div>
+  <div class="group"><label for="seeds">First-level labels</label><select id="seeds"><option value="b12" selected>Three B12 crowns (x, y, z)</option><option value="all">All 36 ring labels · 30 positions</option></select></div>
+  <div class="readout">
+   <div class="metric"><small>Label histories drawn</small><b id="nodeCount">—</b></div><div class="metric"><small>Changed center positions</small><b class="pink" id="changedCount">—</b></div>
+   <div class="metric wide"><small>Inspected lineage · tap a small gyroscope</small><b id="inspected">Three B12 starts</b></div>
+  </div>
+  <div class="path" id="forestPath">Tap a child ring to inspect its B-seat address and memory state.</div>
+  <div class="note">Each visible branch follows a neighbouring ring seat. At a white shared hub it can also <b>switch rings</b>. This is a finite graph-walk sample, not all 30<sup>n</sup> addresses. Pale rings use the same label choices with fixed maps. Coloured rings apply the experimental history rule.</div>
+ </section>
+ <section id="aliasControls" hidden>
+  <div class="group"><label for="aliasStep">Same next labels · depth <span id="aliasStepLabel">3</span></label><input id="aliasStep" class="slider" type="range" min="1" max="6" value="3" step="1"></div>
+  <div class="row"><button id="focusAlias">Focus split</button><button id="resetAlias">Reset view</button></div>
+  <div class="path"><span class="cyan">A:</span> xy:B12 → xy:B1 → xy:B2 → xy:B3 → xy:B4 → xy:B5<br><span class="gold">B:</span> zx:B3 → xy:B1 → xy:B2 → xy:B3 → xy:B4 → xy:B5</div>
+  <div class="readout">
+   <div class="metric"><small>Fixed maps · 3D separation</small><b id="baseGap">0</b></div><div class="metric"><small>History rule · 3D separation</small><b class="pink" id="memoryGap">0</b></div>
+   <div class="metric"><small>History · 2D shadow gap</small><b id="shadowGap">0</b></div><div class="metric"><small>Read charges (A / B)</small><b id="chargeRead">0 / 0</b></div>
+   <div class="metric wide"><small>Current step</small><b id="aliasEvent">—</b></div>
+  </div>
+  <table class="timeline"><thead><tr><th>Step</th><th>Shared labels / action</th><th>read A/B</th><th>next A/B</th></tr></thead><tbody id="aliasTrace"></tbody></table>
+  <div class="note">At step 1, <b>xy:B12 = zx:B3 = +x</b>: two labels for one station. At step 2, both choose xy:B1; only B switches rings at the shared hub and <b>writes</b> a charge. At step 3 the same xy:B2 choice <b>reads</b> that packet; the centres split under the experimental rule. The fixed-map centers coincide throughout.</div>
+ </section>
+ <div class="group"><label for="clock">One B12-to-B12 clock · <span id="clockLabel">B12 start</span></label><input id="clock" class="slider" type="range" min="0" max="12" value="0" step=".05"></div>
+ <div class="row"><button id="play">Play clock</button><button id="b12">B12 ↺</button><select id="speed" aria-label="Clock speed"><option value=".5">½×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select></div>
+ <div class="note"><b>Proposed rule, not a B-constraint theorem:</b> the next child reads a stored charge m∈{0,1,2}. A hub writes 1; a ring switch from a hub writes 2; an ordinary step decreases m by 1 toward zero. The map uses g=1+0.10m, then p′=p+a·g·s and a′=a·q·g. A crown's local phase shifts 10° per <em>read</em> charge. The packet is bounded, and a B12 clock return does not erase it.</div>
+ <div class="formula">B1-inspired selection: next ring-seat label<br>B8/B9-inspired: notice / deferred switch packet<br>B2-inspired forgetting: quiet-step decay<br>B12-inspired: finite turn returns, lineage retained<br>B13: proposed memory stem, not an extra seat<br>q = sin(15°); 0 ≤ m ≤ 2; q·g ≤ 0.310583 &lt; 1.<br>|p| ≤ 1.2/(1−1.2q) ≈ 1.7406.</div>
+ <div class="note">B1–B12 names and opposite-pair history come from Marc's <a href="https://github.com/marccraigartist/SFVFS-Liminus/blob/main/docs/VOLUME1_COMMON_CARRIER_GREEN.md" target="_blank" rel="noopener">Volume 1 B-constraint source</a>. <a href="https://github.com/marccraigartist/SFVFS-Liminus/blob/main/docs/CURRENT_STATUS.md" target="_blank" rel="noopener">Current status</a> defers B13/nested composition. The geometry and feedback coefficients on this page are test choices; finite-state/history-directed fractals are established mathematical territory.</div>
+ </div></details>
+<div class="foot"><div class="line"><b>Two bodies A/X on every selected three-axis crown.</b> Blue/orange star triangles are local screen projections; the central hexagon is their projected intersection.</div><div class="line">Drag or pinch to move; wheel or ± to zoom. B12 resets the visible clock phase while retaining path history. <span class="row"><button id="minus" aria-label="Zoom out">−</button><button id="plus" aria-label="Zoom in">+</button><button id="home">Home view</button></span></div></div>
+<script>
+(()=>{'use strict';
+const TAU=2*Math.PI,Q=Math.sin(Math.PI/12),MAX_G=1.2,BOUND=MAX_G/(1-Q*MAX_G);
+const E=[[1,0,0],[0,1,0],[0,0,1]],PLANES=[[E[0],E[1]],[E[1],E[2]],[E[2],E[0]]],RINGS=['xy','yz','zx'];
+const EX=[1/Math.sqrt(2),-1/Math.sqrt(2),0],EY=[1/Math.sqrt(6),1/Math.sqrt(6),-2/Math.sqrt(6)],COLORS=['#71e5ff','#ff85db','#ffc27b'];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],add=(a,b)=>a.map((v,i)=>v+b[i]),sub=(a,b)=>a.map((v,i)=>v-b[i]),mul=(a,t)=>a.map(v=>v*t),len=a=>Math.hypot(...a),proj=p=>[dot(p,EX),dot(p,EY)];
+const slots=[[],[],[]],stations=[],keyMap=new Map();
+for(let j=0;j<3;j++)for(let k=0;k<12;k++){const [u,v]=PLANES[j],t=TAU*k/12,p=u.map((x,i)=>Math.cos(t)*x+Math.sin(t)*v[i]),key=p.map(x=>Math.round(x*1e9)).join(',');let id=keyMap.get(key);if(id===undefined){id=stations.length;keyMap.set(key,id);stations.push({p,labels:[]});}slots[j][k]=id;stations[id].labels.push({j,k});}
+if(stations.length!==30||stations.filter(s=>s.labels.length===2).length!==6||!(Q*MAX_G<1))throw Error('Station or contraction invariant failed');
+const label=(j,k)=>RINGS[j]+':B'+(k||12),seed={p:[0,0,0],a:1,m:0,read:0,j:null,k:null,id:null,hub:false,switched:false,path:[],depth:0};
+function next(parent,l,mode){const id=slots[l.j][l.k],s=stations[id].p,read=mode==='active'?parent.m:0,g=1+.1*read,hub=stations[id].labels.length===2,switched=parent.j!==null&&parent.j!==l.j&&parent.hub;
+ const nextM=mode==='off'?0:switched?2:hub?1:Math.max(0,parent.m-1);
+ return {p:add(parent.p,mul(s,parent.a*g)),a:parent.a*Q*g,m:nextM,read,j:l.j,k:l.k,id,hub,switched,path:parent.path.concat([l]),depth:parent.depth+1};}
+function choices(node){const l=[{j:node.j,k:(node.k+1)%12},{j:node.j,k:(node.k+11)%12}];if(node.hub){const other=stations[node.id].labels.find(x=>x.j!==node.j);l.push({j:other.j,k:(other.k+1)%12});}return l;}
+const aliasA=[{j:0,k:0},{j:0,k:1},{j:0,k:2},{j:0,k:3},{j:0,k:4},{j:0,k:5}],aliasB=[{j:2,k:3},...aliasA.slice(1)];
+function follow(labels,mode){const out=[seed];for(const l of labels)out.push(next(out.at(-1),l,mode));return out;}
+function aliasData(mode){return {a:follow(aliasA,mode),b:follow(aliasB,mode),baseA:follow(aliasA,'off'),baseB:follow(aliasB,'off')};}
+const check=aliasData('active'),ctrl=aliasData('off');
+if(len(sub(check.a[1].p,check.b[1].p))>1e-10||len(sub(check.a[2].p,check.b[2].p))>1e-10||Math.abs(len(sub(check.a[3].p,check.b[3].p))-.2*1.1*Q*Q)>1e-10||len(sub(ctrl.baseA[6].p,ctrl.baseB[6].p))>1e-10||Math.abs(BOUND-1.2/(1-1.2*Q))>1e-12)throw Error('Alias delay or bound invariant failed');
+const can=document.getElementById('view'),ctx=can.getContext('2d',{alpha:false}),el=id=>document.getElementById(id);
+let W=0,H=0,DPR=1,unit=1,camera={x:0,y:0,z:1},view='forest',feedback='active',seedMode='b12',maxDepth=5,forest=[],selected=-1,aliasStep=3,clock=0,playing=false,last=0,frameAcc=0;
+const centerX=()=>W<760?W*.5:W*.41,centerY=()=>H*.50;
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,1.8);can.width=Math.round(W*DPR);can.height=Math.round(H*DPR);can.style.width=W+'px';can.style.height=H+'px';unit=Math.min(W,H)*(W<760?.28:.32);draw();}
+function screen(p){const u=proj(p);return [centerX()+unit*camera.z*(u[0]-camera.x),centerY()-unit*camera.z*(u[1]-camera.y)];}
+function world(x,y){return [camera.x+(x-centerX())/(unit*camera.z),camera.y-(y-centerY())/(unit*camera.z)];}
+function zoom(f,x,y){const before=world(x,y);camera.z=Math.max(.35,Math.min(100,camera.z*f));const after=world(x,y);camera.x+=before[0]-after[0];camera.y+=before[1]-after[1];draw();}
+function resetView(){camera={x:0,y:0,z:1};draw();}
+function focusAlias(){const d=aliasData(feedback),a=d.a[aliasStep].p,b=d.b[aliasStep].p,u=proj(mul(add(a,b),.5));camera.x=u[0];camera.y=u[1];camera.z=Math.min(70,aliasStep<=2?5:aliasStep===3?14:14*Math.pow(1.8,aliasStep-3));draw();}
+function buildForest(){forest=[];let first=[];if(seedMode==='b12')for(let j=0;j<3;j++)first.push({j,k:0});else for(let j=0;j<3;j++)for(let k=0;k<12;k++)first.push({j,k});
+ let frontier=[{base:seed,mem:seed,parent:-1}];for(let depth=1;depth<=maxDepth;depth++){const nextFrontier=[];for(const pair of frontier){const labels=depth===1?first:choices(pair.mem);for(const l of labels){const item={base:next(pair.base,l,'off'),mem:next(pair.mem,l,feedback),parent:pair.index??-1,index:forest.length};forest.push(item);nextFrontier.push(item);}}frontier=nextFrontier;if(forest.length>3000)break;}
+ if(selected>=forest.length)selected=-1;let changed=forest.filter(x=>len(sub(x.base.p,x.mem.p))>1e-10).length;el('nodeCount').textContent=forest.length.toLocaleString();el('changedCount').textContent=changed.toLocaleString();updateInspection();draw();}
+function updateInspection(){const item=forest[selected];if(!item){el('inspected').textContent=seedMode==='b12'?'Three B12 crowns':'36 labels / 30 stations';el('forestPath').textContent='Tap a child ring to inspect its B-seat address and memory state.';return;}
+ const n=item.mem;el('inspected').textContent=label(n.j,n.k)+' · depth '+n.depth;el('forestPath').textContent=n.path.map(l=>label(l.j,l.k)).join(' → ')+' | read '+n.read+', next '+n.m+(n.switched?' · ring switch':n.hub?' · shared hub':' · quiet step')+' | |Δ3D|='+len(sub(n.p,item.base.p)).toFixed(6);}
+function path(points,color,width,alpha=1,glow=0){if(points.length<2)return;ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineJoin='round';ctx.lineCap='round';ctx.shadowColor=color;ctx.shadowBlur=glow;ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();ctx.restore();}
+function dotAt(p,r,color,alpha=1){const [x,y]=screen(p);ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.shadowColor=color;ctx.shadowBlur=r*3;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();ctx.restore();}
+function ring(node,j,color,alpha,width=1){const r=unit*camera.z*node.a;if(r<.8)return;const [u,v]=PLANES[j],parts=Math.max(16,Math.min(64,Math.round(r*.28))),ps=[];for(let k=0;k<=parts;k++){const t=TAU*k/parts;ps.push(screen(add(node.p,mul(add(mul(u,Math.cos(t)),mul(v,Math.sin(t))),node.a))));}path(ps,color,width,alpha,r>36?width*3:0);}
+function rings(node,style,alpha=1){for(let j=0;j<3;j++)ring(node,j,style==='ghost'?'#8caac7':COLORS[j],style==='ghost'?alpha*.39:alpha,style==='ghost'?.85:1.05);}
+function crownPoint(node,j,t){const [u,v]=PLANES[j];return add(node.p,mul(add(mul(u,Math.cos(t)),mul(v,Math.sin(t))),node.a));}
+function signedArea(poly){let a=0;for(let i=0;i<poly.length;i++){const p=poly[i],q=poly[(i+1)%poly.length];a+=p[0]*q[1]-q[0]*p[1];}return a;}
+function cross2(a,b,p){return(b[0]-a[0])*(p[1]-a[1])-(b[1]-a[1])*(p[0]-a[0]);}
+function clipPoly(subject,clip){const sign=signedArea(clip)>=0?1:-1;let out=subject;for(let i=0;i<clip.length;i++){const a=clip[i],b=clip[(i+1)%clip.length],input=out;out=[];if(!input.length)break;for(let k=0;k<input.length;k++){const p=input[k],q=input[(k+1)%input.length],dp=sign*cross2(a,b,p),dq=sign*cross2(a,b,q);if((dp>=-1e-8)!==(dq>=-1e-8)){const u=dp/(dp-dq);out.push([p[0]+u*(q[0]-p[0]),p[1]+u*(q[1]-p[1])]);}if(dq>=-1e-8)out.push(q);}}return out;}
+function crown(node,alpha=.8,bright=false){const r=unit*camera.z*node.a;if(r<6)return;const t=Math.PI/2-TAU*(clock%12)/12-node.read*Math.PI/18,a=[],x=[];for(let j=0;j<3;j++){a.push(screen(crownPoint(node,j,t)));x.push(screen(crownPoint(node,j,t+Math.PI)));}
+ if(bright||r>28){const hex=clipPoly(a,x);if(hex.length>=3){ctx.save();ctx.globalAlpha=alpha*(bright?.26:.11);ctx.fillStyle='#dca4ff';ctx.shadowColor='#dba0ff';ctx.shadowBlur=bright?20:6;ctx.beginPath();hex.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fill();ctx.restore();path(hex.concat([hex[0]]),'#e2b9ff',bright?1.6:.7,alpha*(bright?.85:.4),bright?11:0);}}
+ path(a.concat([a[0]]),'#98dcff',bright?1.7:.8,alpha,bright?6:0);path(x.concat([x[0]]),'#ffc78c',bright?1.7:.8,alpha,bright?6:0);for(let j=0;j<3;j++){dotAt(crownPoint(node,j,t),bright?3.4:1.7,COLORS[j],alpha);if(bright)dotAt(crownPoint(node,j,t+Math.PI),2,'#ffb986',alpha*.7);}}
+function background(){const g=ctx.createRadialGradient(centerX(),centerY(),0,centerX(),centerY(),Math.max(W,H)*.8);g.addColorStop(0,'#152b49');g.addColorStop(.58,'#0a1630');g.addColorStop(1,'#050a18');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);}
+function forestDraw(){const root={...seed};rings(root,'ghost',.65);for(const item of forest)rings(item.base,'ghost',.43/(1+item.base.depth*.18));
+ for(const item of forest){const n=item.mem;if(unit*camera.z*n.a<1.2)continue;const op=.48/(1+n.depth*.12);rings(n,'axes',op);if(n.depth<=4&&unit*camera.z*n.a>5)crown(n,op*.8,false);}
+ let links=0;for(const item of forest)if(links<500){const a=screen(item.base.p),b=screen(item.mem.p),d=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d>2){path([a,b],'#ff9ed4',1,Math.min(.52,.16+d/150));links++;}}
+ const selectedItem=forest[selected];if(selectedItem){rings(selectedItem.mem,'axes',1);crown(selectedItem.mem,1,true);dotAt(selectedItem.mem.p,5,'#fff',1);}for(const item of forest)if(item.mem.hub&&item.mem.depth<=2)dotAt(item.mem.p,1.8,'#fff',.65);}
+function aliasDraw(){const d=aliasData(feedback);const s=aliasStep;const a=d.a,b=d.b,fa=d.baseA,fb=d.baseB;
+ for(let i=1;i<=s;i++){if(i<s){rings(a[i],'ghost',.14);rings(b[i],'ghost',.14);}rings(fa[i],'ghost',i===s?.65:.3);rings(fb[i],'ghost',i===s?.65:.3);}
+ for(let i=1;i<=s;i++){const op=i===s?1:.30;for(let j=0;j<3;j++){ring(a[i],j,'#75e5ff',op,i===s?2.0:1.0);ring(b[i],j,'#ffc77e',op,i===s?2.0:1.0);}}
+ for(const [seq,color] of [[a,'#74e9ff'],[b,'#ffcb89']]){const ps=seq.slice(1,s+1).map(n=>screen(n.p));path(ps,color,2.0,.75,5);}
+ const na=a[s],nb=b[s],pa=screen(na.p),pb=screen(nb.p);if(len(sub(proj(na.p),proj(nb.p)))>1e-7)path([pa,pb],'#fff',2.0,.9,9);dotAt(na.p,5,'#75e5ff');ctx.save();ctx.strokeStyle='#ffc77e';ctx.lineWidth=2.2;ctx.shadowColor='#ffc77e';ctx.shadowBlur=12;ctx.beginPath();ctx.arc(pb[0],pb[1],8,0,TAU);ctx.stroke();ctx.restore();crown(na,.95,true);crown(nb,.9,true);
+ ctx.save();ctx.fillStyle='#c9dff2';ctx.font='11px system-ui';const x=W<760?W*.5:W*.42,y=H*.16;ctx.textAlign='center';ctx.fillText('same unique station words; two ring-label histories',x,y);ctx.fillText('zoomed geometry · drag to inspect local crowns',x,y+17);ctx.restore();}
+function draw(){if(!W)return;ctx.setTransform(DPR,0,0,DPR,0,0);background();if(view==='forest')forestDraw();else aliasDraw();}
+function updateClock(){const c=Math.floor(clock)%12;el('clockLabel').textContent=clock===0?'B12 start':clock>=12?'B12 return · memory retained':'B'+(c||12)+' · '+clock.toFixed(2)+' turns';el('clock').value=clock;draw();}
+function updateAlias(){const d=aliasData(feedback),s=aliasStep,a=d.a[s],b=d.b[s],ba=d.baseA[s],bb=d.baseB[s],gap=len(sub(a.p,b.p));
+ el('aliasStepLabel').textContent=s;el('aliasStep').value=s;el('baseGap').textContent=len(sub(ba.p,bb.p)).toFixed(9);el('memoryGap').textContent=gap.toFixed(9);el('shadowGap').textContent=len(sub(proj(a.p),proj(b.p))).toFixed(9);el('chargeRead').textContent=a.read+' / '+b.read;
+ el('aliasEvent').textContent=feedback==='off'?(s===1?'Two labels, one +x station · packet disabled':s===2?'Both choose xy:B1 · no packet recorded':'Same next label · fixed-map centers coincide'):feedback==='writeonly'?(s===1?'Hub packet 1 written · reading disabled':s===2?'B switches at +x; packet 2 written · reading disabled':'Packets differ; geometry ignores them'):s===1?'Two labels, one +x center · both write hub packet 1':s===2?'B switched zx→xy at +x · packet 2 written, not yet read':gap>1e-10?'Same next label · earlier packet changed geometry':'Same next label · no center split yet';
+ let html='';for(let i=1;i<=6;i++){const x=d.a[i],y=d.b[i],action=i===1?'shared +x':i===2?'B switches':'same xy:B'+(i-1);html+='<tr'+(i===s?' class=\"current\"':'')+'><td>'+i+'</td><td>'+action+'</td><td>'+x.read+'/'+y.read+'</td><td>'+x.m+'/'+y.m+'</td></tr>';}el('aliasTrace').innerHTML=html;draw();}
+function modeSet(which){view=which;el('forestControls').hidden=which!=='forest';el('aliasControls').hidden=which!=='alias';el('forestTab').classList.toggle('active',which==='forest');el('aliasTab').classList.toggle('active',which==='alias');if(which==='alias')focusAlias();else resetView();draw();}
+el('forestTab').onclick=()=>modeSet('forest');el('aliasTab').onclick=()=>modeSet('alias');el('feedback').onchange=e=>{feedback=e.target.value;buildForest();updateAlias();};el('depth').oninput=e=>{maxDepth=Number(e.target.value);el('depthLabel').textContent=maxDepth;buildForest();};el('seeds').onchange=e=>{seedMode=e.target.value;const max=seedMode==='all'?5:8;el('depth').max=max;maxDepth=Math.min(maxDepth,max);el('depth').value=maxDepth;el('depthLabel').textContent=maxDepth;selected=-1;buildForest();};
+el('aliasStep').oninput=e=>{aliasStep=Number(e.target.value);updateAlias();};el('focusAlias').onclick=focusAlias;el('resetAlias').onclick=resetView;el('clock').oninput=e=>{clock=Number(e.target.value);playing=false;updateClock();};el('play').onclick=()=>{if(clock>=12)clock=0;playing=!playing;el('play').textContent=playing?'Pause clock':'Play clock';updateClock();};el('b12').onclick=()=>{clock=0;playing=false;el('play').textContent='Play clock';updateClock();};
+el('minus').onclick=()=>zoom(.75,centerX(),centerY());el('plus').onclick=()=>zoom(1.33,centerX(),centerY());el('home').onclick=resetView;
+let fingers=new Map(),motion=0;can.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.0015),e.clientX,e.clientY);},{passive:false});can.addEventListener('pointerdown',e=>{can.setPointerCapture(e.pointerId);fingers.set(e.pointerId,{x:e.clientX,y:e.clientY});motion=0;});can.addEventListener('pointermove',e=>{if(!fingers.has(e.pointerId))return;const p=fingers.get(e.pointerId),dx=e.clientX-p.x,dy=e.clientY-p.y;motion+=Math.hypot(dx,dy);if(fingers.size===1){camera.x-=dx/(unit*camera.z);camera.y+=dy/(unit*camera.z);draw();}else {const other=[...fingers.entries()].find(([id])=>id!==e.pointerId)?.[1];if(other){const before=Math.hypot(p.x-other.x,p.y-other.y),after=Math.hypot(e.clientX-other.x,e.clientY-other.y);if(before)zoom(Math.max(.7,Math.min(1.4,after/before)),(e.clientX+other.x)/2,(e.clientY+other.y)/2);}}fingers.set(e.pointerId,{x:e.clientX,y:e.clientY});});
+can.addEventListener('pointerup',e=>{fingers.delete(e.pointerId);if(motion<8&&view==='forest'){let best=-1,dist=16;for(let i=0;i<forest.length;i++){const p=screen(forest[i].mem.p),d=Math.hypot(p[0]-e.clientX,p[1]-e.clientY);if(d<dist){best=i;dist=d;}}selected=best;updateInspection();draw();}});can.addEventListener('pointercancel',e=>fingers.delete(e.pointerId));
+function frame(ts){if(last){const dt=Math.min(.12,(ts-last)/1000);if(playing){clock=Math.min(12,clock+dt*Number(el('speed').value));if(clock>=12){playing=false;el('play').textContent='Play clock';}frameAcc+=dt;if(frameAcc>.045||!playing){frameAcc=0;updateClock();}}}last=ts;requestAnimationFrame(frame);}
+if(innerWidth<760)el('panel').open=false;addEventListener('resize',resize);resize();buildForest();updateAlias();updateClock();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
