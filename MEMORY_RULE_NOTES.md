@@ -30,7 +30,7 @@ The first labels both denote `+x`. At depth one both centers are `+x`, scales ar
 
 Holding the label paths fixed while disabling reads of `m` makes both address centers coincide through these three steps. The **write-only** control still records the same charge packets but forces `read=0` in center, scale and crown-phase calculations; **off** forces `read=0` and suppresses writes. The active versus write-only comparison is the causal ablation: the separation comes from reading history, not from a changed seat sequence or different global clock phase. The two paths have distinct **labels**, even while their selected 3D station directions coincide on the first step.
 
-For the six displayed moves, A/B charges read are `0/0, 1/1, 0/2, 0/1, 0/0, 0/0`. Both charges have decayed to zero by the fifth move, but the centers and scales altered at the third move remain different. This is a precise instance of **finite observable memory leaving a lasting geometric trace** in the selected recursion; it does not imply an unbounded internal register.
+For the six displayed moves, A/B charges read are `0/0, 1/1, 0/2, 0/1, 1/1, 0/0`. The fourth choice `xy:B3` reaches the shared `+y` hub and writes a new packet `1` on both paths. Both charges have returned to zero by the sixth move, yet the centers and scales altered earlier remain different (center separation about `0.0214825149` at move six). This is a precise instance of **finite observable memory leaving a lasting geometric trace** in the selected recursion; it does not imply an unbounded internal register.
 
 ## Why the construction remains bounded
 
